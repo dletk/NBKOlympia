@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{user.first_name}} {{user.last_name}} profile
+{% endblock %}
+
+{% block content %}
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<div class="row">
+	<div class="column left">
+		<div class="column inner-column"><img src="{{user.profile_pic.url}}" width="100%" height="100%"></div>
+		<div class="pending-requests">
+			<h5>Pending member requests</h5>
+			{% for member_request in pending_requests %}
+			<div class="request-card">
+				{{member_request}}
+				<div class="request-buttons">
+					<a class="btn btn-danger" href="{% url 'approveDeclineMemberRequest' member_request.id 'False' %}">Reject</a>
+					<a class="btn btn-success" href="{% url 'approveDeclineMemberRequest' member_request.id 'True' %}">Accept</a>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+	<div id="list_posts" class="column right">
+		{% for post in posts %}
+		<div id="{{post.id}}" class="entry" name="{{post.project}}">
+			<p>
+				<span style="font-weight:bold; color:blue">{{post.project.project_name}}</span>
+				<span style="font-weight:bold; color:tomato">{{post.user.username}}</span>
+				<span style="font-weight:bold">{{post.get_type_display}}:</span>
+				{{post.content}}
+			</p>
+			{% for id, child in children_posts.items %}
+			{% ifequal id post.pk %}
+			{% for child_post in child %}
+			<div id="{{child_post.id}}" class="response">
+				<p>
+					<span style="font-weight:bold; color:tomato">{{child_post.user.username}}:</span>
+					{{child_post.content}}
+				</p>
+			</div>
+			{% endfor %}
+			{% endifequal %}
+			{% endfor %}
+			<!-- TODO: WHENEVER updated the code for reponsd button here, update the ajax code as well. -->
+			<button type="button" class="btn btn-primary respond-button">Respond</button>
+		</div>
+		{% endfor %}
+	</div>
+</div>
+
+<div id="modalDisplay" class="modal">
+</div>
+{% endblock %}
+{% block javascripts %}
+<script>
+	function clickRespond(event) {
+		event.preventDefault();
+		var innerHTMLstr = "<div class='modal-content'><span class='close'>&times;</span></br><form id='respondForm' action='" + "{% url 'makeRespond' %}" + $(event.target).parent().attr('name') + "/" + $(event.target).parent().attr('id') + "' method='post'><div class='form-group'> <label for='content'>Message:</label><textarea name='content' id='content' class='form-control' rows='3'></textarea></div><div class='form-group'><input name='type' style='display: none' value='C'></div><input type='submit' class='btn btn-success float-right' value='Post'></input><button style='margin-right:5px' class='cancel btn btn-danger float-right'>Cancel</button>";
+		var csfr = "<input type='hidden' name='csrfmiddlewaretoken' value='{{ csrf_token }}'></form></div>";
+		$("#modalDisplay").html(innerHTMLstr + csfr);
+		$(".cancel").click(function (event) {
+			event.preventDefault();
+			$("#modalDisplay").hide();
+		});
+		$(".close").click(function () {
+			$("#modalDisplay").hide();
+		});
+		$("#modalDisplay").show();
+
+		// Handle the respond submission using ajax
+		$("#respondForm").submit(function (event) {
+			// Make the form not be submitted
+			event.preventDefault();
+			console.log($("#respondForm").attr("action"));
+			$.ajax({
+				url: $("#respondForm").attr("action"),
+				type: "POST",
+				data: $("#respondForm").serialize(),
+				success: function (data) {
+					console.log($("#respondForm").attr("action"));
+					data = JSON.parse(data);
+
+					// Loop over the data and update the front-end if needed.
+					for (let index = 0; index < data.length; index++) {
+						const post = data[index];
+
+						var newPostDiv = document.createElement("div");
+						newPostDiv.setAttribute("id", Number(post["id"]).toString());
+
+						var content = document.createElement("p");
+						if (post["parent"] == "") {
+							content.innerHTML = "<span style='font-weight: bold; color: blue'>" + post["project"] + "</span> " + "<span style='font-weight: bold; color: tomato'>" + post["user"] + "</span> " + post["content"];
+						} else {
+							content.innerHTML = "<span style='font-weight: bold; color: tomato'>" + post["user"] + ":</span> " + post["content"];
+						}
+						newPostDiv.appendChild(content);
+
+						// This is a response post
+						newPostDiv.setAttribute("class", "response");
+						// This post need to be under its parent, but BEFORE the respond button
+						// THe space in front of button needs to be there because it is CSS selector #id button:lastchild
+						var responseButton = $("#" + Number(post["parent"]).toString() + " button:last-child");
+
+						var childSelector = "#" + Number(post["parent"]).toString();
+						$(newPostDiv).insertBefore(responseButton);
+					}
+				},
+				complete: function () {
+					$("#modalDisplay").hide();
+				}
+			});
+
+		});
+	}
+	
+	$(".respond-button").click(clickRespond);
+
+	function getProfileUpdateAjax() {
+		var posts = $(".entry, .response");
+		var ids = [];
+
+		for (let index = 0; index < posts.length; index++) {
+			const post = posts[index];
+			ids.push(Number($(post).attr("id")));
+		}
+		var max_id = Math.max(...ids);
+
+		$.ajax({
+			url: "{% url 'ajaxUserUpdate' user.username %}" + max_id,
+			success: function (data) {
+				console.log(data);
+				data = JSON.parse(data);
+
+				// Loop over the data and update the front-end if needed.
+				for (let index = 0; index < data.length; index++) {
+					const post = data[index];
+
+					var newPostDiv = document.createElement("div");
+					newPostDiv.setAttribute("id", Number(post["id"]).toString());
+
+					var content = document.createElement("p");
+					if (post["parent"] == "") {
+						// This is a parent post
+						content.innerHTML = "<span style='font-weight: bold; color: blue'>" + post["project"] + "</span> " + "<span style='font-weight: bold; color: tomato'>" + post["user"] +  "</span> " + "<span style='font-weight: bold'>" + post["type"] + ":</span>" + post["content"];
+					} else {
+						content.innerHTML = "<span style='font-weight: bold; color: tomato'>" + post["user"] + ":</span> " + post["content"];
+					}
+					newPostDiv.appendChild(content);
+
+					if (post["parent"] == "") {
+						// This is a parent post
+						newPostDiv.setAttribute("class", "entry");
+						newPostDiv.setAttribute("name", post["project"]);
+						// A parent post should include the reponse button as well
+						var responseButton = document.createElement("button");
+						responseButton.setAttribute("type", "button");
+						responseButton.setAttribute("class", "btn btn-primary respond-button");
+						responseButton.textContent = "Respond";
+						$(responseButton).click(clickRespond);
+						
+						newPostDiv.appendChild(responseButton);
+						$("#list_posts").prepend(newPostDiv);
+					} else {
+						// This is a response post
+						newPostDiv.setAttribute("class", "response");
+						// This post need to be under its parent, but BEFORE the respond button
+						// THe space in front of button needs to be there because it is CSS selector #id button:lastchild
+						var responseButton = $("#" + Number(post["parent"]).toString() + " button:last-child");
+
+						var childSelector = "#" + Number(post["parent"]).toString();
+						$(newPostDiv).insertBefore(responseButton);
+					}
+				}
+			},
+			complete: function () {
+				setTimeout(getProfileUpdateAjax, 2000);
+			}
+		});
+	}
+	$(document).ready(function () {
+		setTimeout(getProfileUpdateAjax, 2000);
+	});
+</script>
+{% endblock %}

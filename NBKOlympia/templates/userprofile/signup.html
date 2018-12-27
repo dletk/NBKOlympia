@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <title>Idea Hub - SignUp</title>
+    <link href="{% static 'userprofile/style.css' %}" rel="stylesheet" type="text/css" />
+    <style>
+        body {
+                    background-color: #314B77;
+                    min-width: 1280px;
+               }
+          </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="d-flex justify-content-center mt-5">
+            <span class="border rounded border-secondary p-5 mr-7" style="background-color: white">
+                <h3 class="d-flex justify-content-center p-2">Sign up</h3>
+                <form method="POST">
+                    {{ form.as_p }}
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-outline-primary float-right">Sign up</button>
+                </form>
+            </span>
+        </div>
+    </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
+<script>
+    var formGroups = $('p');
+    for(let i=0; i < formGroups.length; i++) {
+        var ele = formGroups[i];
+        $(ele).replaceWith("<div class='form-group'>" + $(ele).html() + "</div>");
+    }
+    $('input').addClass("form-control");
+
+    $("input[type='file']").parent().removeClass("form-group").addClass("custom-file");
+    $("input[type='file']").removeClass("form-control").addClass("custom-file-input");
+    $(".custom-file label").addClass("custom-file-label");
+
+    $('li').addClass("text-muted");
+    $('.helptext').addClass("text-muted");
+
+    $('.errorlist li').removeClass("text-muted");
+    $(".errorlist li").attr("style", "color:red");
+
+</script>
+
+</html>
