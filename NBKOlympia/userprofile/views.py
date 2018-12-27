@@ -16,7 +16,7 @@ from .forms import CustomUserCreationForm
 class SignUp(generic.CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy("login")
-    template_name = "userprofile/signup.html"
+    template_name = "baseForm.html"
 
     def get(self, request):
         # Customize the get method, the post method is handled for us by built-in function
@@ -26,5 +26,5 @@ class SignUp(generic.CreateView):
             return redirect("home")
         else:
             form = self.form_class()
-            return render(request, self.template_name, {"form": form})
+            return render(request, self.template_name, {"form": form, "title": "Sign up", "submit": "Đăng ký"})
 
