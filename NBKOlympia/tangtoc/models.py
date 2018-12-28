@@ -41,3 +41,8 @@ class Answer(models.Model):
     # User, who is the owner of this answer
     owner = models.ForeignKey("userprofile.MyUser", on_delete=models.CASCADE)
 
+    def __str__(self):
+        """
+        toString method for an answer
+        """
+        return "Câu hỏi {}, thí sinh: {}, đáp án: {}".format(self.question_number, self.owner, self.content)

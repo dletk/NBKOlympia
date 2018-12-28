@@ -7,6 +7,9 @@ from django.urls import reverse_lazy
 from .forms import QuestionForm, AnswerForm
 
 
+# Global information about what is the current question being asked
+currentQuestion = 0
+
 # Create your views here.
 @login_required(login_url="login")
 def home(request):
@@ -44,4 +47,26 @@ class NewAnswer(generic.CreateView):
     form_class = AnswerForm
     success_url = reverse_lazy("answer")
     template_name = "baseForm.html"
+
+    # Handle the post method to inlcude question number and
+    def post(self, request):
+        global currentQuestion
+
+        user = request.user 
+        # Get the form data submitted by user
+        formAnswer = AnswerForm(request.POST)
+        # Create an answer instance but not yet saved
+        answer = formAnswer.save(commit=False)
+        answer.owner = user
+        answer.question_number = currentQuestion
+
+        # Save the answer
+        answer.save()
+
+        # Return a new page for the next question
+        form = self.form_class()
+        return render(request, template_name=self.template_name, context={"form": form})
+
+
+
 
