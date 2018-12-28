@@ -59,6 +59,23 @@
                 $("#countDown").text(newTime);  
                 sentSignal = true;
                 console.log("Signal sent");
+
+                // Sent out the AJAX request
+                $.ajax({
+                    url: "{% url 'getAnswers' %}",
+                    success: function (data) {
+                        data = JSON.parse(data)
+
+                        // Loop over data and update to the view
+                        for (let i = 0; i < data.length; i++) {
+                            const answer = data[i];
+                            var newAnswer = document.createElement("p");
+                            newAnswer.innerHTML = "<span style='color:red'>"+answer.timeAnswer+"</span>"+"<span> "+answer.owner+"</span>"+": "+answer.content
+                            $("#answersArea").append(newAnswer);
+                        }
+                    }
+                })
+
             }
         }, 1000);
     });
