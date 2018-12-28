@@ -22,6 +22,9 @@ class Question(models.Model):
     #  Solution
     solution = models.CharField(verbose_name="Đáp án", blank=False, max_length=255)
 
+    def __str__(self):
+        return str(self.question_number) + ": " + self.content
+
 class Answer(models.Model):
     """
     The model for all user answers

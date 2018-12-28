@@ -32,6 +32,6 @@ class NewQuestion(generic.CreateView):
 
         if user.is_staff or user.is_superuser:
             form = self.form_class()
-            return render(request, template_name=self.template_name, context={"form": form, "title": "Câu hỏi mới", "submit": "Lưu câu hỏi"})
+            return render(request, template_name=self.template_name, context={"form": form})
         else:
             return HttpResponse("Bạn không được phép truy cập tính năng này, vui lòng liên hệ với thành viên quản lý hoặc admin")

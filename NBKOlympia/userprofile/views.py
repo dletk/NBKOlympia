@@ -26,5 +26,5 @@ class SignUp(generic.CreateView):
             return redirect("home")
         else:
             form = self.form_class()
-            return render(request, self.template_name, {"form": form, "title": "Sign up", "submit": "Đăng ký"})
+            return render(request, self.template_name, {"form": form})
 

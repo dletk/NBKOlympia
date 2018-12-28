@@ -18,11 +18,11 @@
     <div class="container">
         <div class="d-flex justify-content-center mt-5">
             <span class="border rounded border-secondary p-5 mr-7" style="background-color: white">
-                <h3 class="d-flex justify-content-center p-2">{{ title }}</h3>
+                <h3 class="d-flex justify-content-center p-2">Create new data</h3>
                 <form method="POST">
                     {{ form.as_p }}
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-primary btn-outline-primary float-right">{{submit}}</button>
+                    <button type="submit" class="btn btn-primary btn-outline-primary float-right">Save</button>
                 </form>
             </span>
         </div>
