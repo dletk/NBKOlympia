@@ -43,6 +43,9 @@ class Answer(models.Model):
     # User, who is the owner of this answer
     owner = models.ForeignKey("userprofile.MyUser", on_delete=models.CASCADE)
 
+    # Model manager
+    objects = models.Manager()
+
     def __str__(self):
         """
         toString method for an answer

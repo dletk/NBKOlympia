@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views import generic
 from django.urls import reverse_lazy
@@ -8,16 +8,25 @@ from django.core.exceptions import ObjectDoesNotExist
 from .forms import QuestionForm, AnswerForm
 from .models import Question, Answer
 
+from datetime import datetime, timedelta, timezone
+import json
+
 
 # Global information about what is the current question being asked
 currentQuestion = 0
 
 # Create your views here.
+
+
 @login_required(login_url="login")
 def home(request):
     """
     The main page of the program, display all information needed
     """
+    global currentQuestion
+
+    currentQuestion = 0
+
     return render(request, template_name="tangtoc/home.html")
 
 
@@ -41,6 +50,7 @@ class NewQuestion(generic.CreateView):
         else:
             return HttpResponse("Bạn không được phép truy cập tính năng này, vui lòng liên hệ với thành viên quản lý hoặc admin")
 
+
 class NewAnswer(generic.CreateView):
     """
     Class-based view to submit a new answer to the database
@@ -54,7 +64,7 @@ class NewAnswer(generic.CreateView):
     def post(self, request):
         global currentQuestion
 
-        user = request.user 
+        user = request.user
         # Get the form data submitted by user
         formAnswer = AnswerForm(request.POST)
         # Create an answer instance but not yet saved
@@ -69,6 +79,7 @@ class NewAnswer(generic.CreateView):
         form = self.form_class()
         return render(request, template_name=self.template_name, context={"form": form})
 
+
 @login_required(login_url="login")
 def question(request, question_number):
     """
@@ -76,7 +87,7 @@ def question(request, question_number):
     """
     global currentQuestion
 
-    user = request.user    
+    user = request.user
     # Check to make sure that only staff can access this link
     if not user.is_staff:
         return render(request, template_name="tangtoc/home.html", context={"message": "Xin lỗi, bạn không được phép truy cập"})
@@ -89,10 +100,41 @@ def question(request, question_number):
             return render(request, template_name="tangtoc/question.html", context={"question": question})
         except ObjectDoesNotExist:
             # Handle the does not exist exception
-            return render(request, template_name="tangtoc/home.html", 
-                                    context={"message": "Xin lỗi, bạn chưa có câu hỏi số {} trong cơ sở dữ liệu, vui lòng thêm câu hỏi.".format(question_number)})
-        
+            return render(request, template_name="tangtoc/home.html",
+                          context={"message": "Xin lỗi, bạn chưa có câu hỏi số {} trong cơ sở dữ liệu, vui lòng thêm câu hỏi.".format(question_number)})
 
 
-    
+def to_json_answer(answer, currentTime):
+    """
+    Helper method to convert an answer into JSON format
+    """
+    timeAnswerDelta = currentTime - answer.time_posted
+    # Using 31 to have 1 seconds tolerate for people submit before time start
+    timeAnswer = 31 - timeAnswerDelta.total_seconds()
+    if timeAnswer < 0:
+        timeAnswer = 0
+    return dict(owner=str(answer.owner), content=answer.content, timeAnswer=str(timeAnswer))
 
+
+@login_required(login_url="login")
+def getAnswers(request):
+    """
+    Back end code for the AJAX call to get answers of question after timeout
+    """
+    global currentQuestion
+
+    user = request.user
+
+    if not user.is_staff:
+        return HttpResponse("Truy cập bị từ chối")
+    else:
+        # Set the time to query
+        currentTime = datetime.now(timezone(timedelta(hours=7)))
+        # Get all answer of the current question that is before the current time
+        answers = Answer.objects.filter(question_number__iexact=currentQuestion).filter(
+            time_posted__lt=currentTime).order_by("time_posted")
+
+        print(currentQuestion)
+        result = [to_json_answer(answer, currentTime) for answer in answers]
+
+        return JsonResponse(json.dumps(result), safe=False)
