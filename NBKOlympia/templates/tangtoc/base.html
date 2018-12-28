@@ -9,7 +9,7 @@
     <style>
         body {
             background-color: #314B77;
-            min-width: 1280px;
+            min-width: 860px;
         }
 
         .nav-item {
@@ -39,6 +39,14 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link btn btn-outline-success" href="{% url 'question' 4 %}">Câu hỏi 4</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-warning" href="{% url 'newQuestion' %}">Thêm câu hỏi</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-primary" href="{% url 'logout' %}">Logout</a>
                 </li>
             </ul>
     </nav>

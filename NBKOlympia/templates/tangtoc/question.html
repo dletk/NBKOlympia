@@ -6,32 +6,33 @@
             text-align: center;
         }
         button {
-            margin-bottom: 1em;
-            margin-top: 1em;
+            margin-bottom: 0.3em;
+            margin-top: 0.5em;
         }
+        #question {
+            background-color: bisque;
+            margin-top: 2em;
+        }
+
     </style>
 {% endblock %}
 
 {% block content %}
     <div class="col-8" id="question">
         <div class="row">
-            <div class="col">
+            <div class="col-12">
                 <p id="questionContent">{{question.content}}</p>
             </div>
-        </div>
-        <div class="row">
-            <div class="col">
+            <div class="col-12">
                 <img src="question.file.url" alt="File question">
             </div>
         </div>
     </div>
     <div class="col-4" id="manageAnswer">
         <div class="row">
-            <div class="col">
+            <div class="col-12">
                 <button type="button" id="countDown" class="btn btn-danger" style="width:150px; height:150px; font-size: 70px">30</button>
             </div>
-        </div>
-        <div class="row">
             <div class="col-12">
                 <button type="button" class="btn btn-primary">Đáp án thí sinh</button>
             </div>
@@ -44,14 +45,20 @@
 
 {% block scripts %}
 <script>
+    var sentSignal = false;
+
     $("#countDown").click(function() {
         // Disable the button to avoid second click
         $(this).attr("disabled", "disabled");
         // Countdown 30s
         setInterval(function() {
             var newTime = parseInt($("#countDown").text()) - 1;
-            if (newTime >= 0) {
+            if (newTime > 0) {
                 $("#countDown").text(newTime);    
+            } else if (!sentSignal && newTime==0) {
+                $("#countDown").text(newTime);  
+                sentSignal = true;
+                console.log("Signal sent");
             }
         }, 1000);
     });
