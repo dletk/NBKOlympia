@@ -1,0 +1,10 @@
+{% extends 'tangtoc/base.html' %}
+{% block content %}
+    <div class="col">
+        {% if not message %}
+            <h1>Chào mừng đến với chương trình NBK Olympia</h1>
+        {% else %}
+            <h1>{{message}}</h1>
+        {% endif %}
+    </div>
+{% endblock %}

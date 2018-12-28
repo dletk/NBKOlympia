@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <title>NBK Olympia</title>
+    <style>
+        body {
+            background-color: #314B77;
+            min-width: 1280px;
+        }
+
+        .nav-item {
+            margin-left: 1em;
+        }
+    </style>
+    {% block style %}
+    {% endblock %}
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">NBK Olympia</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-success" href="{% url 'home' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-success" href="{% url 'question' 1 %}">Câu hỏi 1</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-success" href="{% url 'question' 2 %}">Câu hỏi 2</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-success" href="{% url 'question' 3 %}">Câu hỏi 3</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-success" href="{% url 'question' 4 %}">Câu hỏi 4</a>
+                </li>
+            </ul>
+    </nav>
+    <div class="container">
+        <div class="row" id="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
+{% block scripts %}
+{% endblock %}
+</html>

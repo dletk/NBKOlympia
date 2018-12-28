@@ -1,0 +1,59 @@
+{% extends 'tangtoc/base.html' %}
+
+{% block style %}
+    <style>
+        .col, .row {
+            text-align: center;
+        }
+        button {
+            margin-bottom: 1em;
+            margin-top: 1em;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="col-8" id="question">
+        <div class="row">
+            <div class="col">
+                <p id="questionContent">{{question.content}}</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <img src="question.file.url" alt="File question">
+            </div>
+        </div>
+    </div>
+    <div class="col-4" id="manageAnswer">
+        <div class="row">
+            <div class="col">
+                <button type="button" id="countDown" class="btn btn-danger" style="width:150px; height:150px; font-size: 70px">30</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <button type="button" class="btn btn-primary">Đáp án thí sinh</button>
+            </div>
+            <div class="col-12" id="answersArea">
+                
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $("#countDown").click(function() {
+        // Disable the button to avoid second click
+        $(this).attr("disabled", "disabled");
+        // Countdown 30s
+        setInterval(function() {
+            var newTime = parseInt($("#countDown").text()) - 1;
+            if (newTime >= 0) {
+                $("#countDown").text(newTime);    
+            }
+        }, 1000);
+    });
+</script>
+{% endblock %}
