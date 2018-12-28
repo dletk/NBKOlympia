@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.views import generic
 from django.urls import reverse_lazy
 
-from .forms import QuestionForm
+from .forms import QuestionForm, AnswerForm
 
 
 # Create your views here.
@@ -35,3 +35,13 @@ class NewQuestion(generic.CreateView):
             return render(request, template_name=self.template_name, context={"form": form})
         else:
             return HttpResponse("Bạn không được phép truy cập tính năng này, vui lòng liên hệ với thành viên quản lý hoặc admin")
+
+class NewAnswer(generic.CreateView):
+    """
+    Class-based view to submit a new answer to the database
+    """
+
+    form_class = AnswerForm
+    success_url = reverse_lazy("answer")
+    template_name = "baseForm.html"
+

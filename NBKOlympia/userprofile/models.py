@@ -20,6 +20,9 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=40, blank=False)
     last_name = models.CharField(max_length=40, blank=False)
     email = models.CharField(max_length=150, blank=True)
+    # Manage the status to indicate a contestant
+    is_contestant = models.BooleanField(default=False, verbose_name="Thí sinh?")
+
     # The profile picture and the date of birth can be i=empty
     profile_pic = models.ImageField(null=True, blank=True, upload_to=user_directory_path, default="userprofile/default_profile.jpg")
 
