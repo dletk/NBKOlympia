@@ -109,11 +109,11 @@ def to_json_answer(answer, currentTime):
     Helper method to convert an answer into JSON format
     """
     timeAnswerDelta = currentTime - answer.time_posted
-    # Using 31 to have 1 seconds tolerate for people submit before time start
-    timeAnswer = 31 - timeAnswerDelta.total_seconds()
+    
+    timeAnswer = 30 - timeAnswerDelta.total_seconds()
     if timeAnswer < 0:
         timeAnswer = 0
-    return dict(owner=str(answer.owner), content=answer.content, timeAnswer=str(timeAnswer))
+    return dict(owner=str(answer.owner), content=answer.content, timeAnswer="{:.3f}".format(timeAnswer))
 
 
 @login_required(login_url="login")
