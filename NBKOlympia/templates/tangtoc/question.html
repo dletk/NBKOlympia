@@ -50,9 +50,9 @@
                 <button type="button" id="countDown" class="btn btn-danger" style="width:150px; height:150px; font-size: 70px">30</button>
             </div>
             <div class="col-12">
-                <button type="button" class="btn btn-primary">Đáp án thí sinh</button>
+                <button type="button" id="showAnswers" class="btn btn-primary">Đáp án thí sinh</button>
             </div>
-            <div class="col-12" id="answersArea">
+            <div class="col-12" id="answersArea" style="display:none">
                 
             </div>
         </div>
@@ -105,6 +105,10 @@
 
             }
         }, 1000);
+    });
+
+    $("#showAnswers").click(function() {
+        $("#answersArea").show();
     });
 </script>
 {% endblock %}

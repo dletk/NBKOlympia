@@ -152,7 +152,7 @@ def getAnswers(request):
         # Set the time to query
         currentTime = datetime.now(timezone(timedelta(hours=7)))
         # Get all answer of the current question that is before the current time
-        answers = Answer.objects.get_final_answers_for(round, currentQuestion).filter(
+        answers = Answer.objects.get_final_answers_for(currentRound, currentQuestion).filter(
             time_posted__lt=currentTime).order_by("time_posted")
 
         result = [to_json_answer(answer, currentTime) for answer in answers]
