@@ -15,7 +15,9 @@ class Question(models.Model):
     # The text content of this question
     content = models.TextField(verbose_name="Câu hỏi", blank=False)
     # The index of this question. In real use, there are only 4 questions numbered 1-4
-    question_number = models.IntegerField(verbose_name="Câu hỏi số", unique=True, blank=False, primary_key=True)
+    question_number = models.IntegerField(verbose_name="Câu hỏi số", unique=True, blank=False)
+    # Round
+    round = models.CharField(max_length=255, verbose_name="Vòng thi", choices=[("tangtoc", "Tăng tốc"), ("vcnv", "VCNV")], blank=False)
     # Question file (for video question or question with image)
     file = models.FileField(verbose_name="File đính kèm", upload_to=question_directory_path, blank=True)
 
@@ -23,6 +25,9 @@ class Question(models.Model):
     solution = models.CharField(verbose_name="Đáp án", blank=False, max_length=255)
 
     objects = models.Manager()
+
+    class Meta:
+        unique_together = (("question_number", "round"),)
 
     def __str__(self):
         return str(self.question_number) + ": " + self.content
@@ -32,7 +37,7 @@ class AnswerManager(models.Manager):
     Custom manager to work with answers model
     """
 
-    def get_final_answers_for(self, question_number):
+    def get_final_answers_for(self, round, question_number):
         """
         Return the query set of final answers from all contestant for this question, sorted by time.
         """
@@ -44,7 +49,7 @@ class AnswerManager(models.Manager):
 
         for person in contestants:
             # Sort by -time_posted to get the most recent one
-            last_answer = self.filter(question_number__iexact=question_number).filter(owner=person).order_by("-time_posted").first()
+            last_answer = self.filter(question_number__iexact=question_number).filter(round=round).filter(owner=person).order_by("-time_posted").first()
             if last_answer is not None:
                 final_querySet |= self.filter(pk=last_answer.pk)
         
@@ -66,6 +71,10 @@ class Answer(models.Model):
 
     # Question number, used to filter all answers for the same question
     question_number = models.IntegerField(verbose_name="Câu hỏi số", blank=False)
+
+    # Round
+    round = models.CharField(max_length=255, verbose_name="Vòng thi", choices=[
+                             ("tangtoc", "Tăng tốc"), ("vcnv", "VCNV"), ("", "Empty")], blank=False)
 
     # User, who is the owner of this answer
     owner = models.ForeignKey("userprofile.MyUser", on_delete=models.CASCADE)

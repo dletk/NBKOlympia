@@ -14,6 +14,7 @@ import json
 
 # Global information about what is the current question being asked
 currentQuestion = 0
+currentRound = ""
 
 # Create your views here.
 
@@ -31,13 +32,14 @@ def reset(request):
     """
     The view to reset the current question to be 0, used to prepare before actual show
     """
-    global currentQuestion
+    global currentQuestion, currentRound
 
     user = request.user
 
     # TODO: Everyone who is a staff that access the homepage will reset the current question to be 0
     if user.is_staff:
         currentQuestion = 0
+        currentRound = ""
         return redirect(reverse_lazy("home"))
     else:
         return render(request, template_name="tangtoc/home.html",
@@ -78,7 +80,7 @@ class NewAnswer(generic.CreateView):
 
     # Handle the post method to inlcude question number and
     def post(self, request):
-        global currentQuestion
+        global currentQuestion, currentRound
 
         user = request.user
         # Get the form data submitted by user
@@ -87,6 +89,7 @@ class NewAnswer(generic.CreateView):
         answer = formAnswer.save(commit=False)
         answer.owner = user
         answer.question_number = currentQuestion
+        answer.round = currentRound
 
         # Save the answer
         answer.save()
@@ -97,11 +100,11 @@ class NewAnswer(generic.CreateView):
 
 
 @login_required(login_url="login")
-def question(request, question_number):
+def question(request, round, question_number):
     """
     View to handle displaying question. Receive a question number to notify the backend code
     """
-    global currentQuestion
+    global currentQuestion, currentRound
 
     user = request.user
     # Check to make sure that only staff can access this link
@@ -111,9 +114,10 @@ def question(request, question_number):
     else:
         # Get the question out of database
         try:
-            question = Question.objects.get(question_number=question_number)
+            question = Question.objects.get(question_number=question_number, round=round)
             # Change current question to the question being displayed
             currentQuestion = question_number
+            currentRound = round
             return render(request, template_name="tangtoc/question.html", context={"question": question})
         except ObjectDoesNotExist:
             # Handle the does not exist exception
@@ -138,7 +142,7 @@ def getAnswers(request):
     """
     Back end code for the AJAX call to get answers of question after timeout
     """
-    global currentQuestion
+    global currentQuestion, currentRound
 
     user = request.user
 
@@ -148,7 +152,7 @@ def getAnswers(request):
         # Set the time to query
         currentTime = datetime.now(timezone(timedelta(hours=7)))
         # Get all answer of the current question that is before the current time
-        answers = Answer.objects.get_final_answers_for(currentQuestion).filter(
+        answers = Answer.objects.get_final_answers_for(round, currentQuestion).filter(
             time_posted__lt=currentTime).order_by("time_posted")
 
         result = [to_json_answer(answer, currentTime) for answer in answers]
