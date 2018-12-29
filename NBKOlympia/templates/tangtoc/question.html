@@ -1,5 +1,5 @@
 {% extends 'tangtoc/base.html' %}
-
+{% load static %}
 {% block style %}
     <style>
         .col, .row {
@@ -50,6 +50,11 @@
     $("#countDown").click(function() {
         // Disable the button to avoid second click
         $(this).attr("disabled", "disabled");
+
+        // Play the music
+        var audio = new Audio("{% static 'tangtoc/TT_30s.mp3' %}");
+        audio.play();
+
         // Countdown 30s
         setInterval(function() {
             var newTime = parseInt($("#countDown").text()) - 1;

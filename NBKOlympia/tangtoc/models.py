@@ -1,5 +1,5 @@
 from django.db import models
-
+from userprofile.models import MyUser
 
 def question_directory_path(instance, filename):
     """
@@ -27,6 +27,33 @@ class Question(models.Model):
     def __str__(self):
         return str(self.question_number) + ": " + self.content
 
+class AnswerManager(models.Manager):
+    """
+    Custom manager to work with answers model
+    """
+
+    def get_final_answers_for(self, question_number):
+        """
+        Return the query set of final answers from all contestant for this question, sorted by time.
+        """
+        # Get all the contestant
+        contestants = MyUser.objects.filter(is_contestant=True)
+
+        # An empty queryset to contains all returned answers
+        final_querySet = self.none()
+
+        for person in contestants:
+            # Sort by -time_posted to get the most recent one
+            last_answer = self.filter(question_number__iexact=question_number).filter(owner=person).order_by("-time_posted").first()
+            if last_answer is not None:
+                final_querySet |= self.filter(pk=last_answer.pk)
+        
+        # Sort the query set by time posted before return
+        final_querySet = final_querySet.order_by("time_posted")
+
+        return final_querySet
+            
+
 class Answer(models.Model):
     """
     The model for all user answers
@@ -44,7 +71,7 @@ class Answer(models.Model):
     owner = models.ForeignKey("userprofile.MyUser", on_delete=models.CASCADE)
 
     # Model manager
-    objects = models.Manager()
+    objects = AnswerManager()
 
     def __str__(self):
         """

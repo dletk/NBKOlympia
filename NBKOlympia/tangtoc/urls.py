@@ -10,4 +10,5 @@ urlpatterns = [
     path("answer/", login_required(views.NewAnswer.as_view(), login_url="login"), name="answer"),
     path("question/<int:question_number>", views.question, name="question"),
     path("getAnswers/", views.getAnswers, name="getAnswers"),
+    path("reset/", views.reset, name="reset"),
 ]

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http.response import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views import generic
@@ -23,11 +23,26 @@ def home(request):
     """
     The main page of the program, display all information needed
     """
+    return render(request, template_name="tangtoc/home.html")
+
+
+@login_required(login_url="login")
+def reset(request):
+    """
+    The view to reset the current question to be 0, used to prepare before actual show
+    """
     global currentQuestion
 
-    currentQuestion = 0
+    user = request.user
 
-    return render(request, template_name="tangtoc/home.html")
+    # TODO: Everyone who is a staff that access the homepage will reset the current question to be 0
+    if user.is_staff:
+        currentQuestion = 0
+        return redirect(reverse_lazy("home"))
+    else:
+        return render(request, template_name="tangtoc/home.html",
+                      context={"message": "Xin lỗi, bạn không được phép truy cập tính năng này"})
+
 
 
 class NewQuestion(generic.CreateView):
@@ -48,7 +63,8 @@ class NewQuestion(generic.CreateView):
             form = self.form_class()
             return render(request, template_name=self.template_name, context={"form": form})
         else:
-            return HttpResponse("Bạn không được phép truy cập tính năng này, vui lòng liên hệ với thành viên quản lý hoặc admin")
+            return render(request, template_name="tangtoc/home.html",
+                          context={"message": "Xin lỗi, bạn không được phép truy cập tính năng này"})
 
 
 class NewAnswer(generic.CreateView):
@@ -90,7 +106,8 @@ def question(request, question_number):
     user = request.user
     # Check to make sure that only staff can access this link
     if not user.is_staff:
-        return render(request, template_name="tangtoc/home.html", context={"message": "Xin lỗi, bạn không được phép truy cập"})
+        return render(request, template_name="tangtoc/home.html",
+                      context={"message": "Xin lỗi, bạn không được phép truy cập tính năng này"})
     else:
         # Get the question out of database
         try:
@@ -131,10 +148,9 @@ def getAnswers(request):
         # Set the time to query
         currentTime = datetime.now(timezone(timedelta(hours=7)))
         # Get all answer of the current question that is before the current time
-        answers = Answer.objects.filter(question_number__iexact=currentQuestion).filter(
+        answers = Answer.objects.get_final_answers_for(currentQuestion).filter(
             time_posted__lt=currentTime).order_by("time_posted")
 
-        print(currentQuestion)
         result = [to_json_answer(answer, currentTime) for answer in answers]
 
         return JsonResponse(json.dumps(result), safe=False)

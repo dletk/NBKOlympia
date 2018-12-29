@@ -1,5 +1,5 @@
-{% load static %}
 <!DOCTYPE html>
+{% load static %}
 <html lang="en" dir="ltr">
 <head>
     <meta charset="utf-8">
@@ -43,10 +43,16 @@
             </ul>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
+                    <a class="nav-link btn btn-outline-warning" href="{% url 'answer' %}">Trả lời câu hỏi</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link btn btn-outline-warning" href="{% url 'newQuestion' %}">Thêm câu hỏi</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link btn btn-outline-primary" href="{% url 'logout' %}">Logout</a>
+                    <a class="nav-link btn btn-outline-danger" href="{% url 'reset' %}">Reset câu hỏi</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-primary" href="{% url 'logout' %}">Logout, {{user}}</a>
                 </li>
             </ul>
     </nav>
