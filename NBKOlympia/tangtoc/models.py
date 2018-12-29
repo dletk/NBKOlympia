@@ -15,7 +15,7 @@ class Question(models.Model):
     # The text content of this question
     content = models.TextField(verbose_name="Câu hỏi", blank=False)
     # The index of this question. In real use, there are only 4 questions numbered 1-4
-    question_number = models.IntegerField(verbose_name="Câu hỏi số", unique=True, blank=False)
+    question_number = models.IntegerField(verbose_name="Câu hỏi số", blank=False)
     # Round
     round = models.CharField(max_length=255, verbose_name="Vòng thi", choices=[("tangtoc", "Tăng tốc"), ("vcnv", "VCNV")], blank=False)
     # Question file (for video question or question with image)

@@ -122,7 +122,7 @@ def question(request, round, question_number):
         except ObjectDoesNotExist:
             # Handle the does not exist exception
             return render(request, template_name="tangtoc/home.html",
-                          context={"message": "Xin lỗi, bạn chưa có câu hỏi số {} trong cơ sở dữ liệu, vui lòng thêm câu hỏi.".format(question_number)})
+                          context={"message": "Xin lỗi, bạn chưa có câu hỏi số {} trong cơ sở dữ liệu cho vòng thi {}, vui lòng thêm câu hỏi.".format(question_number, round)})
 
 
 def to_json_answer(answer, currentTime):
