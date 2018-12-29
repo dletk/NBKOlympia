@@ -13,6 +13,17 @@
             background-color: bisque;
             margin-top: 2em;
         }
+        .answer {
+            text-align: left;
+            background-color: bisque;
+            font-size: 20px;
+            margin: 10px;
+            min-height: 70px;
+            /* min-width: 300px; */
+        }
+        #questionContent {
+            font-size: 40px;
+        }
 
     </style>
 {% endblock %}
@@ -24,7 +35,12 @@
                 <p id="questionContent">{{question.content}}</p>
             </div>
             <div class="col-12">
-                <img src="question.file.url" alt="File question">
+                {% if question.file %}
+                <video width="640" height="480" controls muted>
+                    <source src="{{question.file.url}}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -55,6 +71,11 @@
         var audio = new Audio("{% static 'tangtoc/TT_30s.mp3' %}");
         audio.play();
 
+        // Play the video file if any
+        {% if question.file %}
+            $("video").trigger("play");
+        {% endif %}
+
         // Countdown 30s
         setInterval(function() {
             var newTime = parseInt($("#countDown").text()) - 1;
@@ -74,8 +95,9 @@
                         // Loop over data and update to the view
                         for (let i = 0; i < data.length; i++) {
                             const answer = data[i];
-                            var newAnswer = document.createElement("p");
-                            newAnswer.innerHTML = "<span style='color:red'>"+answer.timeAnswer+"</span>"+"<span> "+answer.owner+"</span>"+": "+answer.content
+                            var newAnswer = document.createElement("div");
+                            newAnswer.setAttribute("class", "answer col");
+                            newAnswer.innerHTML = "<span style='color:red'>"+answer.timeAnswer+"</span>"+"<span style='font-weight: bold'> "+answer.owner+"</span>"+": "+answer.content
                             $("#answersArea").append(newAnswer);
                         }
                     }

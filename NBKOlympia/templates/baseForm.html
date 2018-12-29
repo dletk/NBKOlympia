@@ -19,7 +19,7 @@
         <div class="d-flex justify-content-center mt-5">
             <span class="border rounded border-secondary p-5 mr-7" style="background-color: white">
                 <h3 class="d-flex justify-content-center p-2">Create new data</h3>
-                <form method="POST">
+                <form method="POST" enctype="multipart/form-data">
                     {{ form.as_p }}
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary btn-outline-primary float-right">Submit</button>
@@ -51,6 +51,15 @@
 
     $('.errorlist li').removeClass("text-muted");
     $(".errorlist li").attr("style", "color:red");
+
+    // Handle displaying the filename
+    $("input[type='file']").on('change', function () {
+        //get the file name
+        var fileName = $(this).val();
+        console.log(fileName);
+        //replace the "Choose a file" label
+        $('.custom-file-label').html(fileName);
+    })
 
 </script>
 
