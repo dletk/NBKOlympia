@@ -47,7 +47,13 @@
     <div class="col-4" id="manageAnswer">
         <div class="row">
             <div class="col-12">
-                <button type="button" id="countDown" class="btn btn-danger" style="width:150px; height:150px; font-size: 70px">30</button>
+                <button type="button" id="countDown" class="btn btn-danger" style="width:150px; height:150px; font-size: 70px">
+                    {% ifequal round 'tangtoc' %}
+                    30
+                    {% else %}
+                    15
+                    {% endifequal %}
+                </button>
             </div>
             <div class="col-12">
                 <button type="button" id="showAnswers" class="btn btn-primary">Đáp án thí sinh</button>
@@ -67,8 +73,16 @@
         // Disable the button to avoid second click
         $(this).attr("disabled", "disabled");
 
-        // Play the music
-        var audio = new Audio("{% static 'tangtoc/TT_30s.mp3' %}");
+        // Play the music related to the correct round
+        var audio_path;
+
+        {% ifequal round 'tangtoc' %}
+            audio_path = "{% static 'tangtoc/TT_30s.mp3' %}";
+        {% else %}
+            audio_path = "{% static 'tangtoc/VCNV_15s.mp3' %}";
+        {% endifequal %}
+
+        var audio = new Audio(audio_path);
         audio.play();
 
         // Play the video file if any
@@ -76,7 +90,7 @@
             $("video").trigger("play");
         {% endif %}
 
-        // Countdown 30s
+        // Countdown
         setInterval(function() {
             var newTime = parseInt($("#countDown").text()) - 1;
             if (newTime > 0) {

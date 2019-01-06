@@ -124,7 +124,7 @@ def question(request, round, question_number):
             # Change current question to the question being displayed
             currentQuestion = question_number
             currentRound = round
-            return render(request, template_name="tangtoc/question.html", context={"question": question})
+            return render(request, template_name="tangtoc/question.html", context={"question": question, "round": round})
         except ObjectDoesNotExist:
             # Handle the does not exist exception
             return render(request, template_name="tangtoc/home.html",
@@ -157,9 +157,15 @@ def to_json_answer(answer, currentTime):
     """
     Helper method to convert an answer into JSON format
     """
+    global currentRound
+
     timeAnswerDelta = currentTime - answer.time_posted
     
-    timeAnswer = 30 - timeAnswerDelta.total_seconds()
+    if currentRound == "tangtoc":
+        timeAnswer = 30 - timeAnswerDelta.total_seconds()
+    elif currentRound == "vcnv":
+        timeAnswer = 15 - timeAnswerDelta.total_seconds()
+
     if timeAnswer < 0:
         timeAnswer = 0
     return dict(owner=str(answer.owner), content=answer.content, timeAnswer="{:.3f}".format(timeAnswer))
