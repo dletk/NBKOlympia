@@ -35,6 +35,18 @@
                     <a class="nav-link btn btn-outline-success" href="{% url 'home' %}">Home</a>
                 </li>
                 <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="khoiDongDropdown" role="button" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        Khởi động
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="khoiDongDropdown">
+                        <a class="nav-link btn btn-sm btn-outline-secondary" style="margin:3px" href="{% url 'khoidong' 'ts1' %}">Thí sinh 1</a>
+                        <a class="nav-link btn btn-sm btn-outline-secondary" style="margin:3px" href="{% url 'khoidong' 'ts2' %}">Thí sinh 2</a>
+                        <a class="nav-link btn btn-sm btn-outline-secondary" style="margin:3px" href="{% url 'khoidong' 'ts3' %}">Thí sinh 3</a>
+                        <a class="nav-link btn btn-sm btn-outline-secondary" style="margin:3px" href="{% url 'khoidong' 'ts4' %}">Thí sinh 4</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="tangtocDropDown" role="button" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">
                         Tăng tốc

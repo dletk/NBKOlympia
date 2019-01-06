@@ -1,0 +1,89 @@
+{% extends 'tangtoc/base.html' %}
+{% load static %}
+{% block style %}
+    <style>
+        .col, .row {
+            text-align: center;
+        }
+        button {
+            margin-bottom: 0.3em;
+            margin-top: 0.5em;
+        }
+        #question {
+            background-color: bisque;
+            margin-top: 2em;
+        }
+        #questionContent {
+            font-size: 40px;
+        }
+
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="col-8" id="question">
+        <div class="row">
+            <div class="col-12">
+                <button class="btn btn-outline-primary" id="nextQuestion">Câu hỏi tiếp theo</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <p id="questionContent"></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-4" id="manageAnswer">
+        <div class="row">
+            <div class="col-12">
+                <button type="button" id="countDown" class="btn btn-danger" style="width:150px; height:150px; font-size: 70px">60</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $("#countDown").click(function() {
+        // Disable the button to avoid second click
+        $(this).attr("disabled", "disabled");
+
+        // Play the music
+        var batdau = new Audio("{% static 'tangtoc/kd_batdau.mp3' %}");
+        batdau.play();
+
+        batdau.onended = function(event) {
+            var demgio = new Audio("{% static 'tangtoc/kd_nhac60s.mp3' %}");
+            demgio.play();
+
+            // Display the first question
+            let questionContent = questions[currentQuestion];
+            $("#questionContent").text(questionContent);
+            currentQuestion++;
+
+            // Countdown 60s
+            setInterval(function () {
+                var newTime = parseInt($("#countDown").text()) - 1;
+                if (newTime > 0) {
+                    $("#countDown").text(newTime);
+                } else if (newTime == 0) {
+                    $("#countDown").text(newTime);
+                }
+            }, 1000);
+        };
+    });
+
+
+    // Store all questions in an array
+    let questions = {{ questions|safe }};
+
+    var currentQuestion = 0;
+
+    $("#nextQuestion").click(function(event) {
+        let questionContent = questions[currentQuestion];
+
+        $("#questionContent").text(questionContent);
+        currentQuestion++;
+    });
+</script>
+{% endblock %}

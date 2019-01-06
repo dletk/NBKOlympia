@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.views import generic
 from django.urls import reverse_lazy
 from django.core.exceptions import ObjectDoesNotExist
+from django.core import serializers
+
 
 from .forms import QuestionForm, AnswerForm
 from .models import Question, Answer
@@ -127,6 +129,23 @@ def question(request, round, question_number):
             # Handle the does not exist exception
             return render(request, template_name="tangtoc/home.html",
                           context={"message": "Xin lỗi, bạn chưa có câu hỏi số {} trong cơ sở dữ liệu cho vòng thi {}, vui lòng thêm câu hỏi.".format(question_number, round)})
+
+
+@login_required(login_url="login")
+def khoidong(request, thi_sinh):
+    """
+    Method to handle khoidong round, return the set of question related to thi_sinh
+    """
+    # Get all the questions related to this person for khoidong
+    questions = Question.objects.filter(contestant=thi_sinh).filter(round="khoidong").values_list("content")
+    if len(questions) == 0:
+        return render(request, template_name="tangtoc/home.html",
+                      context={"message": "Xin lỗi, bạn chưa có câu hỏi cho thí sinh này trong cơ sở dữ liệu cho vòng thi khoi dong, vui lòng thêm câu hỏi."})
+    else:
+        # Convert the querySet to list to pass to JS variable later
+        return render(request, template_name="tangtoc/khoidong.html", context={"questions": json.dumps(list(questions))})
+
+
 
 
 def to_json_answer(answer, currentTime):

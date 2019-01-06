@@ -1,11 +1,13 @@
 from django.db import models
 from userprofile.models import MyUser
 
+
 def question_directory_path(instance, filename):
     """
     Method to return the path as MEDIA_ROOT/<username>/filename
     """
     return "tangtoc/{}/{}".format(instance.question_number, filename)
+
 
 class Question(models.Model):
     """
@@ -15,14 +17,22 @@ class Question(models.Model):
     # The text content of this question
     content = models.TextField(verbose_name="Câu hỏi", blank=False)
     # The index of this question. In real use, there are only 4 questions numbered 1-4
-    question_number = models.IntegerField(verbose_name="Câu hỏi số", blank=False)
+    question_number = models.IntegerField(
+        verbose_name="Câu hỏi số", blank=False)
     # Round
-    round = models.CharField(max_length=255, verbose_name="Vòng thi", choices=[("tangtoc", "Tăng tốc"), ("vcnv", "VCNV")], blank=False)
+    round = models.CharField(max_length=255, verbose_name="Vòng thi", choices=[(
+        "tangtoc", "Tăng tốc"), ("vcnv", "VCNV"), ("khoidong", "Khởi động"), ("vedich", "Về đích")], blank=False)
+
+    # Some question is assigned directly to a contestant
+    contestant = models.CharField(max_length=255, blank=True, choices=[
+                                  ("ts1", "Thí sinh 1"), ("ts2", "Thí sinh 2"), ("ts3", "Thí sinh 3"), ("ts4", "Thí sinh 4")])
     # Question file (for video question or question with image)
-    file = models.FileField(verbose_name="File đính kèm", upload_to=question_directory_path, blank=True)
+    file = models.FileField(verbose_name="File đính kèm",
+                            upload_to=question_directory_path, blank=True)
 
     #  Solution
-    solution = models.CharField(verbose_name="Đáp án", blank=False, max_length=255)
+    solution = models.CharField(
+        verbose_name="Đáp án", blank=False, max_length=255)
 
     objects = models.Manager()
 
@@ -30,7 +40,8 @@ class Question(models.Model):
         unique_together = (("question_number", "round"),)
 
     def __str__(self):
-        return str(self.question_number) + ": " + self.content
+        return str(self.round) + ": " + str(self.question_number) + ": " + self.content
+
 
 class AnswerManager(models.Manager):
     """
@@ -49,32 +60,36 @@ class AnswerManager(models.Manager):
 
         for person in contestants:
             # Sort by -time_posted to get the most recent one
-            last_answer = self.filter(question_number__iexact=question_number).filter(round=round).filter(owner=person).order_by("-time_posted").first()
+            last_answer = self.filter(question_number__iexact=question_number).filter(
+                round=round).filter(owner=person).order_by("-time_posted").first()
             if last_answer is not None:
                 final_querySet |= self.filter(pk=last_answer.pk)
-        
+
         # Sort the query set by time posted before return
         final_querySet = final_querySet.order_by("time_posted")
 
         return final_querySet
-            
+
 
 class Answer(models.Model):
     """
     The model for all user answers
     """
     # Content of the answer, cannot be blank.
-    content = models.CharField(max_length=255, blank=False, verbose_name="Đáp án")
+    content = models.CharField(
+        max_length=255, blank=False, verbose_name="Đáp án")
 
     # Time posted to server, so we can see who is the first
-    time_posted = models.DateTimeField(verbose_name="Thời gian trả lời", auto_now_add=True, blank=False)
+    time_posted = models.DateTimeField(
+        verbose_name="Thời gian trả lời", auto_now_add=True, blank=False)
 
     # Question number, used to filter all answers for the same question
-    question_number = models.IntegerField(verbose_name="Câu hỏi số", blank=False)
+    question_number = models.IntegerField(
+        verbose_name="Câu hỏi số", blank=False)
 
     # Round
     round = models.CharField(max_length=255, verbose_name="Vòng thi", choices=[
-                             ("tangtoc", "Tăng tốc"), ("vcnv", "VCNV"), ("", "Empty")], blank=False)
+                             ("tangtoc", "Tăng tốc"), ("vcnv", "VCNV"), ("khoidong", "Khởi động"), ("vedich", "Về đích"), ("", "Empty")], blank=False)
 
     # User, who is the owner of this answer
     owner = models.ForeignKey("userprofile.MyUser", on_delete=models.CASCADE)
