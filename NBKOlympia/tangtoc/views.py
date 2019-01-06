@@ -137,7 +137,7 @@ def khoidong(request, thi_sinh):
     Method to handle khoidong round, return the set of question related to thi_sinh
     """
     # Prevent this page from being accessed by contestant
-    if user.is_staff:
+    if request.user.is_staff:
         # Get all the questions related to this person for khoidong
         questions = Question.objects.filter(contestant=thi_sinh).filter(round="khoidong").values_list("content")
         if len(questions) == 0:
