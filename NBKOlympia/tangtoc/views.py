@@ -96,7 +96,11 @@ class NewAnswer(generic.CreateView):
 
         # Return a new page for the next question
         form = self.form_class()
-        return render(request, template_name=self.template_name, context={"form": form})
+        return render(request, template_name=self.template_name, context={"form": form, "answerView": True})
+    
+    def get(self, request):
+        form = self.form_class()
+        return render(request, template_name=self.template_name, context={"form": form, "answerView": True})
 
 
 @login_required(login_url="login")
@@ -136,6 +140,28 @@ def to_json_answer(answer, currentTime):
         timeAnswer = 0
     return dict(owner=str(answer.owner), content=answer.content, timeAnswer="{:.3f}".format(timeAnswer))
 
+def get_current_question(request):
+    """
+    Method to get the current question for AJAX to update the answer view
+
+    Return the current question's content only, as JSON format
+    """
+    global currentQuestion
+    global currentRound
+
+    result = None
+
+    if currentQuestion == "":
+        result = dict(question="")
+        return JsonResponse(json.dumps(result), safe=False)
+    else:
+        try:
+            question = Question.objects.get(question_number=currentQuestion, round=currentRound)
+            return JsonResponse(json.dumps(dict(question=question.content)), safe=False)
+        except ObjectDoesNotExist:
+            result = dict(question="")
+            return JsonResponse(json.dumps(result), safe=False)
+    
 
 @login_required(login_url="login")
 def getAnswers(request):

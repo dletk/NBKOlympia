@@ -16,9 +16,23 @@
 
 <body>
     <div class="container">
+        {% if answerView %}
         <div class="d-flex justify-content-center mt-5">
             <span class="border rounded border-secondary p-5 mr-7" style="background-color: white">
-                <h3 class="d-flex justify-content-center p-2">Create new data</h3>
+                <div id="questionContent" style="font-weight: bold; font-size: 20px"></div>
+            </span>
+        </div>
+        {% endif %}
+
+        <div class="d-flex justify-content-center mt-5">
+            <span class="border rounded border-secondary p-5 mr-7" style="background-color: white">
+                <h3 class="d-flex justify-content-center p-2">
+                    {% if answerView %}
+                    Nộp đáp án
+                    {% else %}
+                    Create new data
+                    {% endif %}
+                </h3>
                 <form method="POST" enctype="multipart/form-data">
                     {{ form.as_p }}
                     {% csrf_token %}
@@ -60,6 +74,19 @@
         //replace the "Choose a file" label
         $('.custom-file-label').html(fileName);
     })
+
+    // Make AJAX calls tot update the current question
+    {% if answerView %}
+    setInterval(function() {
+        $.ajax({
+            url: "{% url 'getCurrentQuestion' %}",
+            success: function(data) {
+                data = JSON.parse(data);
+                $("#questionContent").text(data.question);
+            }
+        })
+    }, 1000);
+    {% endif %}
 
 </script>
 
