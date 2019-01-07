@@ -30,7 +30,7 @@ def home(request):
 
 
 @login_required(login_url="login")
-def reset(request):
+def resetQuestion(request):
     """
     The view to reset the current question to be 0, used to prepare before actual show
     """
@@ -46,7 +46,6 @@ def reset(request):
     else:
         return render(request, template_name="tangtoc/home.html",
                       context={"message": "Xin lỗi, bạn không được phép truy cập tính năng này"})
-
 
 
 class NewQuestion(generic.CreateView):

@@ -12,5 +12,5 @@ urlpatterns = [
     path("question/khoidong/<str:thi_sinh>", views.khoidong, name="khoidong"),
     path("getAnswers/", views.getAnswers, name="getAnswers"),
     path("getCurrentQuestion,", views.get_current_question, name="getCurrentQuestion"),
-    path("reset/", views.reset, name="reset"),
+    path("resetQuestion/", views.resetQuestion, name="resetQuestion"),
 ]

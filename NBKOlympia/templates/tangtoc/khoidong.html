@@ -81,8 +81,12 @@
 
     $("#nextQuestion").click(function(event) {
         let questionContent = questions[currentQuestion];
-
-        $("#questionContent").text(questionContent);
+        if (currentQuestion >= questions.length) {
+            $("#questionContent").text("Kết thúc phần thi");    
+        } else {
+            $("#questionContent").text(questionContent);    
+        }
+        
         currentQuestion++;
     });
 </script>
