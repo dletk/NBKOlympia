@@ -24,7 +24,7 @@ class Question(models.Model):
         "tangtoc", "Tăng tốc"), ("vcnv", "VCNV"), ("khoidong", "Khởi động"), ("vedich", "Về đích")], blank=False)
 
     # Some question is assigned directly to a contestant
-    contestant = models.CharField(max_length=255, blank=True, choices=[
+    contestant = models.CharField(max_length=255, verbose_name = "Thí sinh",  blank=True, choices=[
                                   ("ts1", "Thí sinh 1"), ("ts2", "Thí sinh 2"), ("ts3", "Thí sinh 3"), ("ts4", "Thí sinh 4")])
     # Question file (for video question or question with image)
     file = models.FileField(verbose_name="File đính kèm",
