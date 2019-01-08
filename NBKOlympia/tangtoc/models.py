@@ -30,6 +30,9 @@ class Question(models.Model):
     file = models.FileField(verbose_name="File đính kèm",
                             upload_to=question_directory_path, blank=True)
 
+    # Value of the question
+    value = models.IntegerField(verbose_name="Giá trị câu hỏi", choices=[(10,10),(20,20),(30,30)], blank=True, null=True)
+
     #  Solution
     solution = models.CharField(
         verbose_name="Đáp án", blank=False, max_length=255)
