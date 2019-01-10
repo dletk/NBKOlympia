@@ -30,6 +30,10 @@ class Question(models.Model):
     file = models.FileField(verbose_name="File đính kèm",
                             upload_to=question_directory_path, blank=True)
 
+    # TODO: Make a field for type of knowledge
+    type_knowledge = models.CharField(max_length=255, verbose_name="Lĩnh vực", blank=True, choices = [
+                                ("toan", "toan"), ("ly", "ly"), ("hoa", "hoa"), ("anh", "anh"), ("van", "van"), ("su", "su"), ("sinh","sinh"), ("dia", "dia"), ("tin", "tin"), ("cau_hoi_chung", "cau_hoi_chung")],null=True)
+
     # Value of the question
     value = models.IntegerField(verbose_name="Giá trị câu hỏi", choices=[(10,10),(20,20),(30,30)], blank=True, null=True)
 
