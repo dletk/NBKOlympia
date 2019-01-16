@@ -5,13 +5,15 @@ from django.views import generic
 from django.urls import reverse_lazy
 from django.core.exceptions import ObjectDoesNotExist
 from django.core import serializers
-
+from django.db.models import Q
 
 from .forms import QuestionForm, AnswerForm
 from .models import Question, Answer
 
+
 from datetime import datetime, timedelta, timezone
 import json
+import random
 
 
 # Global information about what is the current question being asked
@@ -150,6 +152,85 @@ def khoidong(request, thi_sinh):
                       context={"message": "Xin lỗi, bạn không được phép truy cập tính năng này"})
 
 
+def to_json_question(question):
+    """
+    Helper method to convert a question to JSON format
+    """
+    if question.file:
+        return dict(content=question.content, file=question.file.read(), solution=question.solution)
+    else:
+        return dict(content=question.content, file=None, solution=question.solution)
+def get_3_questions(question_values):
+    """
+    Helper method to get 3 available questions from the database based on question values provided as a list
+    [10,10,20],....
+    """
+    # Get all available questions for vedich
+    questions_vedich = Question.objects.filter(
+        round="vedich").filter(used=False)
+
+    # Get all available questions for 10, 20, 30 value
+    questions = {10: questions_vedich.filter(value=10),
+                 20: questions_vedich.filter(value=20),
+                 30: questions_vedich.filter(value=30)}
+
+    list_questions = []
+
+    for value in question_values:
+        print(value)
+        print(len(questions[value]))
+        question = questions[value][random.randint(0, len(questions[value])-1)]
+        # Mark this question as used and save
+        question.used = True
+        question.save()
+
+        list_questions.append(question)
+
+        # Remove all the question with the same type of knowledge
+        questions[10] = questions[10].exclude(
+            type_knowledge=question.type_knowledge)
+        questions[20] = questions[20].exclude(
+            type_knowledge=question.type_knowledge)
+        questions[30] = questions[30].exclude(
+            type_knowledge=question.type_knowledge)
+
+    return [to_json_question(question) for question in list_questions]
+
+
+@login_required(login_url="login")
+def vedich(request, goi_cau_hoi):
+    """
+    Method to handle the view for vedich round, return a set of question with the current required goi_cau_hoi value
+    """
+    # Prevent the access of contestant
+    if request.user.is_staff:
+        if goi_cau_hoi == 40:
+            question_value = [10,10,20]
+            try:
+                questions = get_3_questions(question_value)
+            except ValueError:
+                return render(request, template_name="tangtoc/home.html",
+                              context={"message": "Xin lỗi, bạn không có đủ câu hỏi để tạo gói {} mới".format(goi_cau_hoi)})
+        elif goi_cau_hoi == 60:
+            question_value = [10, 20, 30]
+            try:
+                questions = get_3_questions(question_value)
+            except ValueError:
+                return render(request, template_name="tangtoc/home.html",
+                              context={"message": "Xin lỗi, bạn không có đủ câu hỏi để tạo gói {} mới".format(goi_cau_hoi)})
+        else:
+            question_value = [20, 30, 30]
+            try:
+                questions = get_3_questions(question_value)
+            except ValueError:
+                return render(request, template_name="tangtoc/home.html",
+                              context={"message": "Xin lỗi, bạn không có đủ câu hỏi để tạo gói {} mới".format(goi_cau_hoi)})
+        # Convert the querySet to list to pass to JS variable later
+        print(questions)
+        return render(request, template_name="tangtoc/vedich.html", context={"questions": json.dumps(questions), "values": question_value})
+    else:
+        return render(request, template_name="tangtoc/home.html",
+                      context={"message": "Xin lỗi, bạn không được phép truy cập tính năng này"})
 
 
 def to_json_answer(answer, currentTime):

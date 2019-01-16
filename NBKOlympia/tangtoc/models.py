@@ -37,6 +37,9 @@ class Question(models.Model):
     # Value of the question
     value = models.IntegerField(verbose_name="Giá trị câu hỏi", choices=[(10,10),(20,20),(30,30)], blank=True, null=True)
 
+    # Boolean value indicating whether the question is used
+    used = models.BooleanField(verbose_name="Đã sử dụng", blank=False, default=False)
+
     #  Solution
     solution = models.CharField(
         verbose_name="Đáp án", blank=False, max_length=255)
