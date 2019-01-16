@@ -157,9 +157,11 @@ def to_json_question(question):
     Helper method to convert a question to JSON format
     """
     if question.file:
-        return dict(content=question.content, file=question.file.read(), solution=question.solution)
+        return dict(content=question.content, file=question.file.url, solution=question.solution)
     else:
         return dict(content=question.content, file=None, solution=question.solution)
+
+
 def get_3_questions(question_values):
     """
     Helper method to get 3 available questions from the database based on question values provided as a list
