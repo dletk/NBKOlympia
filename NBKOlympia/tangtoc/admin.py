@@ -15,7 +15,12 @@ class QuestionAdmin(admin.ModelAdmin):
     ordering = ["round"]
     actions = [marks_all_as_unused]
 
+
+class AnswerAdmin(admin.ModelAdmin):
+    list_display = ["content", "round", "question_number", "owner"]
+    ordering = ["-time_posted"]
+
 admin.site.register(Question, QuestionAdmin)
-admin.site.register(Answer)
+admin.site.register(Answer, AnswerAdmin)
 
 admin.site.site_header = "NBK OLYMPIA - Trang quản lý"
