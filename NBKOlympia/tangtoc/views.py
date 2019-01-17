@@ -173,9 +173,9 @@ def to_json_question(question):
     Helper method to convert a question to JSON format
     """
     if question.file:
-        return dict(content=question.content, file=question.file.url, solution=question.solution, file_type=get_file_type(question.file.url))
+        return dict(content=question.content, file=question.file.url, solution=question.solution, file_type=get_file_type(question.file.url), value=question.value)
     else:
-        return dict(content=question.content, file=None, solution=question.solution, file_type=None)
+        return dict(content=question.content, file=None, solution=question.solution, file_type=None, value=question.value)
 
 
 def get_3_questions(question_values):
@@ -195,8 +195,6 @@ def get_3_questions(question_values):
     list_questions = []
 
     for value in question_values:
-        print(value)
-        print(len(questions[value]))
         question = questions[value][random.randint(0, len(questions[value])-1)]
         # Mark this question as used and save
         question.used = True
@@ -244,7 +242,6 @@ def vedich(request, goi_cau_hoi):
                 return render(request, template_name="tangtoc/home.html",
                               context={"message": "Xin lỗi, bạn không có đủ câu hỏi để tạo gói {} mới".format(goi_cau_hoi)})
         # Convert the querySet to list to pass to JS variable later
-        print(questions)
         return render(request, template_name="tangtoc/vedich.html", context={"questions": json.dumps(questions), "values": question_value})
     else:
         return render(request, template_name="tangtoc/home.html",

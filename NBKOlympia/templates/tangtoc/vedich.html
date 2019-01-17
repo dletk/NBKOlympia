@@ -47,32 +47,66 @@
 
 {% block scripts %}
 <script>
+
+    function displayQuestion() {
+        question = questions[currentQuestionNumber];
+        let questionContent = question.content;
+        let questionFile = question.file;
+        let questionFileType = question.file_type;
+
+        if (currentQuestionNumber >= questions.length) {
+            $("#questionContent").text("Kết thúc phần thi");
+        } else {
+            $("#questionContent").text(questionContent);
+            if (questionFile) {
+                console.log(questionFileType);
+                if (questionFileType == "image") {
+                    $("#questionFile").html("<img width='640' height='480' src=" + questionFile + "/>");
+                } else if (questionFileType == "video") {
+                    $("#questionFile").html("<video width='640' height='480' controls><source src=" + questionFile + " type='video/mp4'></video>");
+                }
+            } else {
+                $("#questionFile").html("");
+            }
+        }
+
+        // Display the correct amount of time
+        if (question.value == 10) {
+            $("#countDown").text(10);
+        } else if (question.value == 20) {
+            $("#countDown").text(15);
+        } else {
+            $("#countDown").text(20);
+        }
+
+        // Move the counter to the next question
+        currentQuestionNumber++;
+    }
+
     $("#countDown").click(function() {
         // Disable the button to avoid second click
         $(this).attr("disabled", "disabled");
 
         var demgio;
-        
-        demgio = new Audio("{% static 'tangtoc/kd_nhac60s.mp3' %}");
+        // The music depends on the value of question
+        if (question.value == 10) {
+            demgio = new Audio("{% static 'tangtoc/VD_10s.mp3' %}");
+        } else if (question.value == 20) {
+            demgio = new Audio("{% static 'tangtoc/VD_15s.mp3' %}");
+        } else {
+            demgio = new Audio("{% static 'tangtoc/VD_20s.mp3' %}");
+        }
         demgio.play();
-
-        // Display the first question
-        let questionContent = questions[currentQuestion].content;
-        let questionFile = questions[currentQuestion].file;
-
-        $("#questionContent").text(questionContent);
-        $("#questionFile").attr("src", questionFile);
-        currentQuestion++;
-
-        // Countdown 60s
+        
+        // Countdown, when the value become 0, kill the counter
         var interval = setInterval(function () {
             var newTime = parseInt($("#countDown").text()) - 1;
-            console.log(newTime);
             if (newTime > 0) {
                 $("#countDown").text(newTime);
             } else if (newTime == 0) {
                 $("#countDown").removeAttr("disabled");
                 $("#countDown").text(newTime);
+                // Kill the counter
                 clearInterval(interval);
             }
         }, 1000);
@@ -83,31 +117,12 @@
     // Store all questions in an array
     let questions = {{ questions|safe }};
 
-    var currentQuestion = 0;
+    var currentQuestionNumber = 0;
+    var question;
 
     $("#nextQuestion").click(function(event) {
-        let questionContent = questions[currentQuestion].content;
-        let questionFile = questions[currentQuestion].file;
-        let questionFileType = questions[currentQuestion].file_type;
-
-        if (currentQuestion >= questions.length) {
-            $("#questionContent").text("Kết thúc phần thi");    
-        } else {
-            $("#questionContent").text(questionContent);
-            if (questionFile) {
-                console.log(questionFileType);
-                if (questionFileType == "image") {
-                    $("#questionFile").html("<img width='640' height='480' src=" + questionFile +"/>");
-                } else if (questionFileType == "video") {
-                    $("#questionFile").html("<video width='640' height='480' controls><source src="+questionFile+" type='video/mp4'></video>");
-                }
-            } else {
-                $("#questionFile").html("");
-            }
-            
-        }
-        
-        currentQuestion++;
+        // Display the question
+        displayQuestion();
     });
 </script>
 {% endblock %}
