@@ -152,14 +152,26 @@ def khoidong(request, thi_sinh):
                       context={"message": "Xin lỗi, bạn không được phép truy cập tính năng này"})
 
 
+def get_file_type(file_name):
+    """
+    Helper method to get the file type of the given file name
+    """
+    # +1 for the index to ignore the dot "."
+    file_extension = file_name[file_name.rindex(".")+1:].lower()
+    if file_extension in ["mp4", "mov"]:
+        return "video"
+    else:
+        return "image"
+
+
 def to_json_question(question):
     """
     Helper method to convert a question to JSON format
     """
     if question.file:
-        return dict(content=question.content, file=question.file.url, solution=question.solution)
+        return dict(content=question.content, file=question.file.url, solution=question.solution, file_type=get_file_type(question.file.url))
     else:
-        return dict(content=question.content, file=None, solution=question.solution)
+        return dict(content=question.content, file=None, solution=question.solution, file_type=None)
 
 
 def get_3_questions(question_values):

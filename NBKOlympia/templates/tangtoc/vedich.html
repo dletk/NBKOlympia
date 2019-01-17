@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="col-8" id="question">
+    <div class="col-9" id="question">
         <div class="row">
             <div class="col-12">
                 <button class="btn btn-outline-primary" id="nextQuestion">Câu hỏi tiếp theo</button>
@@ -31,12 +31,12 @@
             <div class="col-12">
                 <p id="questionContent"></p>
             </div>
-            <div class="col-12">
-                <img style="max-width:640; max-height:480px" src="" id="questionFile">
+            <div class="col-12" id="questionFile">
+                
             </div>
         </div>
     </div>
-    <div class="col-4" id="manageAnswer">
+    <div class="col-3" id="manageAnswer">
         <div class="row">
             <div class="col-12">
                 <button type="button" id="countDown" class="btn btn-danger" style="width:150px; height:150px; font-size: 70px">60</button>
@@ -88,12 +88,23 @@
     $("#nextQuestion").click(function(event) {
         let questionContent = questions[currentQuestion].content;
         let questionFile = questions[currentQuestion].file;
+        let questionFileType = questions[currentQuestion].file_type;
 
         if (currentQuestion >= questions.length) {
             $("#questionContent").text("Kết thúc phần thi");    
         } else {
-            $("#questionContent").text(questionContent);    
-            $("#questionFile").attr("src", questionFile);
+            $("#questionContent").text(questionContent);
+            if (questionFile) {
+                console.log(questionFileType);
+                if (questionFileType == "image") {
+                    $("#questionFile").html("<img width='640' height='480' src=" + questionFile +"/>");
+                } else if (questionFileType == "video") {
+                    $("#questionFile").html("<video width='640' height='480' controls><source src="+questionFile+" type='video/mp4'></video>");
+                }
+            } else {
+                $("#questionFile").html("");
+            }
+            
         }
         
         currentQuestion++;
