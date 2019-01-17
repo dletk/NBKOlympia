@@ -44,6 +44,10 @@ def resetQuestion(request):
     if user.is_staff:
         currentQuestion = 0
         currentRound = ""
+
+        # Delete all answers
+        Answer.objects.all().delete()
+
         return redirect(reverse_lazy("home"))
     else:
         return render(request, template_name="tangtoc/home.html",

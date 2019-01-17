@@ -13,8 +13,15 @@
             background-color: bisque;
             margin-top: 2em;
         }
-        #questionContent {
+        #questionContent, .questionNumber {
             font-size: 40px;
+        }
+        .questionNumber, #nextQuestion {
+            margin-top: 0.1em;
+        }
+        .questionNumber {
+            margin-bottom: 0;
+            color: red;
         }
 
     </style>
@@ -24,6 +31,7 @@
     <div class="col-9" id="question">
         <div class="row">
             <div class="col-12">
+                <p class="questionNumber"><span id="questionNumber">0</span><span>/12</span></p>
                 <button class="btn btn-outline-primary" id="nextQuestion">Câu hỏi tiếp theo</button>
             </div>
         </div>
@@ -59,6 +67,7 @@
             // Display the first question
             let questionContent = questions[currentQuestion];
             $("#questionContent").text(questionContent);
+            $("#questionNumber").text(1);
             currentQuestion++;
 
             // Countdown 60s
@@ -85,6 +94,7 @@
             $("#questionContent").text("Kết thúc phần thi");    
         } else {
             $("#questionContent").text(questionContent);    
+            $("#questionNumber").text(currentQuestion + 1);
         }
         
         currentQuestion++;
