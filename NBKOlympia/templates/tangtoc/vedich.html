@@ -51,32 +51,32 @@
         // Disable the button to avoid second click
         $(this).attr("disabled", "disabled");
 
-        // Play the music
-        var batdau = new Audio("{% static 'tangtoc/kd_batdau.mp3' %}");
-        batdau.play();
+        var demgio;
+        
+        demgio = new Audio("{% static 'tangtoc/kd_nhac60s.mp3' %}");
+        demgio.play();
 
-        batdau.onended = function(event) {
-            var demgio = new Audio("{% static 'tangtoc/kd_nhac60s.mp3' %}");
-            demgio.play();
+        // Display the first question
+        let questionContent = questions[currentQuestion].content;
+        let questionFile = questions[currentQuestion].file;
 
-            // Display the first question
-            let questionContent = questions[currentQuestion].content;
-            let questionFile = questions[currentQuestion].file;
+        $("#questionContent").text(questionContent);
+        $("#questionFile").attr("src", questionFile);
+        currentQuestion++;
 
-            $("#questionContent").text(questionContent);
-            $("#questionFile").attr("src", questionFile);
-            currentQuestion++;
+        // Countdown 60s
+        var interval = setInterval(function () {
+            var newTime = parseInt($("#countDown").text()) - 1;
+            console.log(newTime);
+            if (newTime > 0) {
+                $("#countDown").text(newTime);
+            } else if (newTime == 0) {
+                $("#countDown").removeAttr("disabled");
+                $("#countDown").text(newTime);
+                clearInterval(interval);
+            }
+        }, 1000);
 
-            // Countdown 60s
-            setInterval(function () {
-                var newTime = parseInt($("#countDown").text()) - 1;
-                if (newTime > 0) {
-                    $("#countDown").text(newTime);
-                } else if (newTime == 0) {
-                    $("#countDown").text(newTime);
-                }
-            }, 1000);
-        };
     });
 
 
