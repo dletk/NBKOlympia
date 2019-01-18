@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  nbkolym:
+    build: .
+    volumes:
+      - nbkolymdatabase:/NBKOlym
+      - static_volume:/NBKOlym/static  # <-- bind the static volume
+      - media_volume:/NBKOlym/media  # <-- bind the media volume
+    networks: 
+      - nginx_network
+
+  nginx:
+    image: nginx:1.13
+    ports:
+      - 8000:80
+    volumes:
+      - ./config/nginx/conf.d:/etc/nginx/conf.d
+      - static_volume:/NBKOlym/static  # <-- bind the static volume
+      - media_volume:/NBKOlym/media  # <-- bind the media volume
+    depends_on:  # <-- wait for NBKOlym to be "ready" before starting this service
+      - nbkolym
+    networks:
+      - nginx_network
+  
+networks: 
+  nginx_network:
+    driver: bridge
+  
+volumes:
+  nbkolymdatabase:
+  static_volume:
+  media_volume:
