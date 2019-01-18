@@ -19,6 +19,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=40, unique=True, blank=False)
     first_name = models.CharField(max_length=40, blank=False)
     last_name = models.CharField(max_length=40, blank=False)
+    display_name = models.CharField(max_length=255, blank=True, verbose_name="Tên hiển thị", default="")
     email = models.CharField(max_length=150, blank=True)
     # Manage the status to indicate a contestant
     is_contestant = models.BooleanField(default=False, verbose_name="Thí sinh?")
@@ -41,4 +42,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ["first_name", "last_name", "email"]
 
     def __str__(self):
-        return self.first_name + " " + self.last_name
+        if self.display_name == "":
+            return self.first_name + " " + self.last_name
+        else:
+            return self.display_name
