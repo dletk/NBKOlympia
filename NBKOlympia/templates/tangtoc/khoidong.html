@@ -48,10 +48,38 @@
             </div>
         </div>
     </div>
+    {% csrf_token %}
+
 {% endblock %}
 
 {% block scripts %}
 <script>
+    var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+    function makeAjaxCall(questionContent) {
+        // Make the AJAX call to notify the current question to the server and other screen of contestant
+        $.ajax({
+            url: "{% url 'getCurrentQuestion'%}",
+            method: "POST",
+            data: {"question":questionContent},
+            dataType: "json",
+            traditional: true,
+            success: function (data) {
+                // Do nothing
+            }
+        });
+    }
+
     $("#countDown").click(function() {
         // Disable the button to avoid second click
         $(this).attr("disabled", "disabled");
@@ -69,6 +97,8 @@
             $("#questionContent").text(questionContent);
             $("#questionNumber").text(1);
             currentQuestion++;
+            // Update the current question to server
+            makeAjaxCall(questionContent);
 
             // Countdown 60s
             setInterval(function () {
@@ -93,8 +123,9 @@
         if (currentQuestion >= questions.length) {
             $("#questionContent").text("Kết thúc phần thi");    
         } else {
-            $("#questionContent").text(questionContent);    
+            $("#questionContent").text(questionContent);
             $("#questionNumber").text(currentQuestion + 1);
+            makeAjaxCall(questionContent);
         }
         
         currentQuestion++;
