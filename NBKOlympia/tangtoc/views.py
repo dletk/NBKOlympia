@@ -18,6 +18,7 @@ import random
 
 # Global information about what is the current question being asked
 currentQuestion = 0
+currentQuestionContent = ""
 currentRound = ""
 
 # Create your views here.
@@ -36,13 +37,14 @@ def resetQuestion(request):
     """
     The view to reset the current question to be 0, used to prepare before actual show
     """
-    global currentQuestion, currentRound
+    global currentQuestion, currentRound, currentQuestionContent
 
     user = request.user
 
     # TODO: Everyone who is a staff that access the homepage will reset the current question to be 0
     if user.is_staff:
         currentQuestion = 0
+        currentQuestionContent = ""
         currentRound = ""
 
         # Delete all answers
@@ -115,7 +117,7 @@ def question(request, round, question_number):
     """
     View to handle displaying question. Receive a question number to notify the backend code
     """
-    global currentQuestion, currentRound
+    global currentQuestion, currentRound, currentQuestionContent
 
     user = request.user
     # Check to make sure that only staff can access this link
@@ -126,9 +128,13 @@ def question(request, round, question_number):
         # Get the question out of database
         try:
             question = Question.objects.get(question_number=question_number, round=round)
+            
             # Change current question to the question being displayed
             currentQuestion = question_number
+            currentQuestionContent = question.content
             currentRound = round
+
+
             return render(request, template_name="tangtoc/question.html", context={"question": question, "round": round})
         except ObjectDoesNotExist:
             # Handle the does not exist exception
@@ -196,9 +202,6 @@ def get_3_questions(question_values):
 
     for value in question_values:
         question = questions[value][random.randint(0, len(questions[value])-1)]
-        # Mark this question as used and save
-        question.used = True
-        question.save()
 
         list_questions.append(question)
 
@@ -209,6 +212,11 @@ def get_3_questions(question_values):
             type_knowledge=question.type_knowledge)
         questions[30] = questions[30].exclude(
             type_knowledge=question.type_knowledge)
+    
+    # Mark all selected question as used
+    for question in list_questions:
+        question.used = True
+        question.save()
 
     return [to_json_question(question) for question in list_questions]
 
@@ -271,22 +279,22 @@ def get_current_question(request):
 
     Return the current question's content only, as JSON format
     """
-    global currentQuestion
+    global currentQuestion, currentQuestionContent
     global currentRound
 
     result = None
-
-    if currentQuestion == "":
-        result = dict(question="")
-        return JsonResponse(json.dumps(result), safe=False)
-    else:
-        try:
-            question = Question.objects.get(question_number=currentQuestion, round=currentRound)
-            return JsonResponse(json.dumps(dict(question=question.content)), safe=False)
-        except ObjectDoesNotExist:
+    # Response the current question with json format with a get method
+    if request.method == "GET":
+        if currentQuestionContent == "":
             result = dict(question="")
             return JsonResponse(json.dumps(result), safe=False)
-    
+        else:
+            return JsonResponse(json.dumps(dict(question=currentQuestionContent)), safe=False)
+    elif request.method == "POST":
+        currentQuestionContent = request.POST.get("question", "")
+        return JsonResponse(json.dumps(dict(question=currentQuestionContent)), safe=False)
+        
+        
 
 @login_required(login_url="login")
 def getAnswers(request):
