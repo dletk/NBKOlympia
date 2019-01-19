@@ -2,7 +2,7 @@ version: "3"
 
 services:
   nbkolym:
-    build: .
+    image: cuphatk/nbk_olympia_nbkolym:latest
     volumes:
       - nbkolymdatabase:/NBKOlym
       - static_volume:/NBKOlym/static  # <-- bind the static volume
