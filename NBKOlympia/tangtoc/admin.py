@@ -11,7 +11,7 @@ def marks_all_as_unused(modeladmin, request, queryset):
 marks_all_as_unused.short_description = "Đánh dấu câu hỏi là chưa sử dụng"
 
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ["content", "round", "used", "contestant"]
+    list_display = ["content", "round", "used", "contestant", "value"]
     ordering = ["round"]
     actions = [marks_all_as_unused]
 
