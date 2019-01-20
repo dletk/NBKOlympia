@@ -27,6 +27,9 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     # The profile picture and the date of birth can be i=empty
     profile_pic = models.ImageField(null=True, blank=True, upload_to=user_directory_path, default="userprofile/default_profile.jpg")
 
+    # Current grade of contestant
+    grade = models.IntegerField(verbose_name="Điểm", blank=True, default=0)
+
     # Management variables for django
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
