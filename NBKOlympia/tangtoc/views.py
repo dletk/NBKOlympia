@@ -9,6 +9,7 @@ from django.db.models import Q
 
 from .forms import QuestionForm, AnswerForm
 from .models import Question, Answer
+from userprofile.models import MyUser
 
 
 from datetime import datetime, timedelta, timezone
@@ -42,7 +43,7 @@ def resetQuestion(request):
     user = request.user
 
     # TODO: Everyone who is a staff that access the homepage will reset the current question to be 0
-    if user.is_staff:
+    if user.is_superuser:
         currentQuestion = 0
         currentQuestionContent = ""
         currentRound = ""
@@ -317,3 +318,26 @@ def getAnswers(request):
         result = [to_json_answer(answer, currentTime) for answer in answers]
 
         return JsonResponse(json.dumps(result), safe=False)
+
+
+@login_required(login_url="login")
+def updateGrade(request, username=None, value=None):
+    """
+    View to handle the grading to update the current grade of contestant 
+    """
+    if request.user.is_staff:
+        if username is not None:
+            MyUser.objects.filter(username=username).update(grade=value)
+        return HttpResponse("Updated");
+    else:
+        return render(request, template_name="tangtoc/home.html",
+                    context={"message": "Xin lỗi, bạn không được phép truy cập tính năng này"})
+
+@login_required(login_url="login")
+def grading(request):
+    """
+    View to display the current grading of contestant
+    """
+    contestants = MyUser.objects.filter(is_contestant=True)
+
+    return render(request, template_name="tangtoc/grade.html", context={"contestants": contestants})

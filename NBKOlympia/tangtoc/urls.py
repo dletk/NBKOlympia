@@ -14,4 +14,7 @@ urlpatterns = [
     path("getAnswers/", views.getAnswers, name="getAnswers"),
     path("getCurrentQuestion,", views.get_current_question, name="getCurrentQuestion"),
     path("resetQuestion/", views.resetQuestion, name="resetQuestion"),
+    path("grading/", views.grading, name="grading"),
+    path("updateGrade/<str:username>/<int:value>", views.updateGrade, name="updateGrade"),
+    path("updateGrade/", views.updateGrade, name="updateGrade")
 ]
