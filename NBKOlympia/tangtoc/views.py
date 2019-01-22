@@ -325,7 +325,7 @@ def updateGrade(request, username=None, value=None):
     """
     View to handle the grading to update the current grade of contestant 
     """
-    if request.user.is_staff:
+    if request.user.is_thuky or request.user.is_staff:
         if username is not None:
             MyUser.objects.filter(username=username).update(grade=value)
         return HttpResponse("Updated");

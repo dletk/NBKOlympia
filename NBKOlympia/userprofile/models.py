@@ -34,6 +34,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
+    is_thuky = models.BooleanField(default=False)
 
     # The manager to control the objects created using this model
     objects = UserManager()
